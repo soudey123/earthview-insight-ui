@@ -17,6 +17,7 @@ interface AnalysisResult {
 
 const Index = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [jsonExpanded, setJsonExpanded] = useState(false);
@@ -28,6 +29,14 @@ const Index = () => {
       if (file.type === 'image/jpeg' || file.type === 'image/png') {
         setSelectedFile(file);
         setAnalysisResult(null);
+        
+        // Create image preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setImagePreview(e.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+        
         toast({
           title: "File selected",
           description: `${file.name} is ready for analysis`,
@@ -197,6 +206,27 @@ const Index = () => {
                     </Button>
                   </div>
                 </div>
+              )}
+
+              {/* Image Preview */}
+              {imagePreview && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Image Preview</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="relative">
+                      <img
+                        src={imagePreview}
+                        alt="Uploaded satellite image"
+                        className="w-full h-64 object-cover rounded-lg shadow-md"
+                      />
+                      <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-xs">
+                        {selectedFile?.name}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               )}
             </CardContent>
           </Card>
